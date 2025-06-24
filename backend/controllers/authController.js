@@ -17,18 +17,28 @@ exports.register = async (req, res) => {
 };
 
 exports.login = async (req, res) => {
-    const { email, password } = req.body;
+  const { email, password } = req.body;
 
-    try {
-        const user = await User.findOne({ where: { email } });
-        if (!user) return res.status(401).json({ error: 'Niepoprawne dane' });
+  try {
+    const user = await User.findOne({ where: { email } });
+    if (!user) return res.status(401).json({ error: 'Niepoprawne dane' });
 
-        const valid = await bcrypt.compare(password, user.password);
-        if (!valid) return res.status(401).json({ error: 'Niepoprawne dane' });
+    const valid = await bcrypt.compare(password, user.password);
+    if (!valid) return res.status(401).json({ error: 'Niepoprawne dane' });
 
-        const token = jwt.sign({ id: user.id, email: user.email }, SECRET, { expiresIn: '1d' });
-        res.json({ message: 'Zalogowano', token });
-    } catch (err) {
-        res.status(500).json({ error: 'Błąd logowania', details: err.message });
-    }
+    const token = jwt.sign({ id: user.id, email: user.email }, SECRET, { expiresIn: '1d' });
+
+    res.json({
+      message: 'Zalogowano',
+      token,
+      user: {
+        id: user.id,
+        email: user.email,
+        name: user.name,
+      },
+    });
+  } catch (err) {
+    res.status(500).json({ error: 'Błąd logowania', details: err.message });
+  }
 };
+
