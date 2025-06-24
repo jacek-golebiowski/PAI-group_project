@@ -8,7 +8,6 @@ export default function Navbar() {
   const { user, logout } = useAuth();
   const menuRef = useRef();
 
-  // Close dropdown when clicking outside
   useEffect(() => {
     const handleClickOutside = (e) => {
       if (menuRef.current && !menuRef.current.contains(e.target)) {
@@ -22,7 +21,8 @@ export default function Navbar() {
   return (
     <nav style={styles.nav}>
       <div>
-        <Link to="/" style={styles.logo}>🏠 Home</Link>
+        <Link to="/" style={{...styles.link, marginRight: 20 }}>🏠 Home</Link>
+        {user && <Link to="/rent" style={styles.link}>Rent</Link>}
       </div>
 
       <div style={styles.userArea} ref={menuRef}>
@@ -45,22 +45,26 @@ export default function Navbar() {
 }
 
 const styles = {
-  nav: {
-    display: 'flex',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    padding: '10px 20px',
-    background: '#1976d2',
-    color: '#fff',
-    position: 'sticky',
-    top: 0,
-    zIndex: 10,
-  },
-  logo: {
-    color: '#fff',
+nav: {
+  position: 'sticky',
+  top: 0,
+  zIndex: 999,
+  display: 'flex',
+  justifyContent: 'space-between',
+  width: '100%',
+  alignItems: 'center',
+  padding: '12px 24px',
+  background: 'rgba(0, 0, 0, 0.6)',
+  color: '#fff',
+  backdropFilter: 'blur(8px)',
+  boxShadow: '0 2px 4px rgba(0,0,0,0.3)',
+},
+  link: {
+    color: '#FFF',
     textDecoration: 'none',
     fontWeight: 'bold',
     fontSize: 18,
+    cursor: 'pointer',
   },
   userArea: {
     display: 'flex',
@@ -78,7 +82,7 @@ const styles = {
     position: 'absolute',
     top: 30,
     right: 0,
-    background: '#fff',
+    background: 'rgba(0, 0, 0, 0.6)',
     color: '#000',
     borderRadius: 6,
     boxShadow: '0 4px 8px rgba(0,0,0,0.2)',
@@ -87,10 +91,5 @@ const styles = {
     flexDirection: 'column',
     gap: 6,
     minWidth: 120,
-  },
-  link: {
-    color: '#1976d2',
-    textDecoration: 'none',
-    cursor: 'pointer',
   },
 };

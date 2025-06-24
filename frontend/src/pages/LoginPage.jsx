@@ -1,14 +1,15 @@
 import { useState } from 'react';
 import { loginUser } from '../api/auth';
 import { useAuth } from '../AuthContext';
+import { useNavigate } from 'react-router-dom';
 
 export default function LoginPage() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
 
-const { login } = useAuth();
-const [msg, setMsg] = useState('');
-
+  const { login } = useAuth();
+  const [msg, setMsg] = useState('');
+  const navigate = useNavigate();
 
   const handleLogin = async (e) => {
     e.preventDefault();
@@ -16,6 +17,7 @@ const [msg, setMsg] = useState('');
       const data = await loginUser(email, password);
       setMsg(`Logged in as ${data.user?.email || JSON.stringify(data)}`);
       login(data.user);
+      navigate('/');
     } catch (err) {
       setMsg('Login failed: ' + JSON.stringify(err.response?.data || err.message));
     }
