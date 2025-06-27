@@ -37,3 +37,4 @@ To clear all existing data from the database without deleting the file:
 
 Run this in terminal:
     sqlite3 database.sqlite "DELETE FROM Users; DELETE FROM Categories; DELETE FROM Products; DELETE FROM sqlite_sequence;"
+    
