@@ -1,0 +1,71 @@
+### Rejestracja użytkownika
+POST http://localhost:3000/api/auth/register
+Content-Type: application/json
+
+{
+  "email": "test@user.com",
+  "password": "12345678",
+  "name": "Test User"
+}
+
+###
+
+### Logowanie użytkownika
+POST http://localhost:3000/api/auth/login
+Content-Type: application/json
+
+{
+  "email": "test@user.com",
+  "password": "12345678"
+}
+
+### Tutaj wklejcie token po zalogowaniu
+@token = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwiZW1haWwiOiJ0ZXN0QHVzZXIuY29tIiwiaWF0IjoxNzUxMDUxMTI1LCJleHAiOjE3NTExMzc1MjV9.5vYWWvrRZQGPVMhjJr3vsYw5OFmEXKGRYcKugX_f-V0
+### Tworzenie kategorii
+POST http://localhost:3000/api/categories
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+  "name": "Laptopy",
+  "description": "Testowa kategoria"
+}
+
+###
+
+### Dodanie produktu
+POST http://localhost:3000/api/products
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+  "name": "Laptop Lenovo",
+  "price": 2999.99,
+  "stock": 10,
+  "categoryId": 1
+}
+
+###
+
+### Wypożyczenie produktu
+POST http://localhost:3000/api/rentals
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+  "items": [
+    { "productId": 1, "quantity": 1 }
+  ]
+}
+
+###
+
+### Historia wypożyczeń użytkownika
+GET http://localhost:3000/api/rentals
+Authorization: Bearer {{token}}
+
+###
+
+### Historia wszystkich wypożyczeń
+GET http://localhost:3000/api/rentals/history
+Authorization: Bearer {{token}}
