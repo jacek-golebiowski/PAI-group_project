@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import { Link } from 'react-router-dom';
 import Navbar from '../components/Navbar';
 import sportsBanner from '../../images/sports-banner.png';
 
@@ -6,7 +7,7 @@ export default function HomePage() {
   const [products, setProducts] = useState([]);
 
   useEffect(() => {
-    fetch('/products')
+    fetch('/api/products')
       .then(res => res.json())
       .then(data => setProducts(data))
       .catch(err => console.error('Error fetching products:', err));
@@ -27,7 +28,11 @@ export default function HomePage() {
       <div className="product-grid">
         {products.map(product => (
           <div key={product.id} className="product-card dark">
-            <h3>{product.name}</h3>
+            <h3>
+              <Link to={`/products/${product.id}`} style={{ color: '#000', textDecoration: 'none' }}>
+              {product.name}
+            </Link>
+            </h3>
             <p>{product.description}</p>
             <p><strong>{product.price} zł</strong> – Stock: {product.stock}</p>
           </div>
