@@ -2,8 +2,6 @@ import { Routes, Route } from 'react-router-dom';
 import HomePage from './pages/HomePage';
 import LoginPage from './pages/LoginPage';
 import RegisterPage from './pages/RegisterPage';
-import Navbar from './components/Navbar';
-import Button from './components/Button';
 import RentPage from './pages/RentPage';
 import ProductPage from './pages/ProductPage';
 

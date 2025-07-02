@@ -4,22 +4,22 @@ import { useAuth } from '../AuthContext';
 import { useNavigate } from 'react-router-dom';
 
 export default function LoginPage() {
-  const [email, setEmail] = useState('');
+  const [email, setEmail]       = useState('');
   const [password, setPassword] = useState('');
-
-  const { login } = useAuth();
-  const [msg, setMsg] = useState('');
-  const navigate = useNavigate();
+  const [msg, setMsg]           = useState('');
+  const { login }               = useAuth();
+  const navigate                = useNavigate();
 
   const handleLogin = async (e) => {
     e.preventDefault();
     try {
       const data = await loginUser(email, password);
-      setMsg(`Logged in as ${data.user?.email || JSON.stringify(data)}`);
-      login(data.user);
+      // store both user & token
+      login({ user: data.user, token: data.token });
+      setMsg(`Logged in as ${data.user.email}`);
       navigate('/');
     } catch (err) {
-      setMsg('Login failed: ' + JSON.stringify(err.response?.data || err.message));
+      setMsg('Login failed: ' + err.message);
     }
   };
 

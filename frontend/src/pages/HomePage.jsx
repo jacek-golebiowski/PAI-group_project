@@ -3,11 +3,13 @@ import { Link } from 'react-router-dom';
 import Navbar from '../components/Navbar';
 import Button from '../components/Button';
 import sportsBanner from '../../images/sports-banner.png';
+import { useAuth } from '../AuthContext';
 
 export default function HomePage() {
   const [products, setProducts] = useState([]);
   const [quantities, setQuantities] = useState({});
   const [messages, setMessages] = useState({});
+  const { token } = useAuth();
 
   useEffect(() => {
     fetchProducts();
@@ -35,11 +37,11 @@ export default function HomePage() {
     if (!quantity || quantity < 1) return;
 
     try {
-      const res = await fetch('/api/rent', {
+      const res = await fetch('/api/rentals', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          Authorization: `Bearer ${localStorage.getItem('token')}`,
+          Authorization: `Bearer ${token}`,
         },
         body: JSON.stringify({ items: [{ productId, quantity }] }),
       });
@@ -137,7 +139,6 @@ export default function HomePage() {
                 )}
               </div>
 
-              {/* Bottom: Button + Message */}
               <div style={{ marginTop: 'auto' }}>
                 {product.stock > 0 && (
                   <>
