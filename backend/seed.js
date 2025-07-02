@@ -5,8 +5,8 @@ const Product = require('./models/Product');
 
 async function seed() {
   try {
-    await sequelize.sync({ force: true });
-
+    const isDevelopmentOrTest = ['development', 'test'].includes(process.env.NODE_ENV);
+    await sequelize.sync({ force: isDevelopmentOrTest, alter: !isDevelopmentOrTest });
     const categoriesData = [
       { name: 'Bikes', description: 'Mountain, road, and city bikes' },
       { name: 'Skis', description: 'Downhill and cross-country skis' },
