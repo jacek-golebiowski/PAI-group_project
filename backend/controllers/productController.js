@@ -8,9 +8,19 @@ const getFullimageName = (req, imageName) => {
 
 exports.getAll = async (req, res, next) => {
   try {
-    const prods = await Product.findAll({
-      include: [{ model: Category, as: 'category', attributes: ['id','name'] }]
-    });
+      const { categoryId } = req.query;
+      const where = {};
+
+      if (categoryId) {
+          where.categoryId = categoryId;
+      }
+
+      const prods = await Product.findAll({
+          where,
+          include: [
+              { model: Category, as: 'category', attributes: ['id', 'name'] }
+          ]
+      });
 
     const productsWithFullUrl = prods.map(prod => {
       const productJson = prod.toJSON();

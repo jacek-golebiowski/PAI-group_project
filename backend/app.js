@@ -10,7 +10,7 @@ require('./models/User');
 require('./models/Category');
 require('./models/Product');
 
-sequelize.sync({ alter: true })
+sequelize.sync()
     .then(() => console.log('✔ DB synced'))
     .catch(e => console.error('✖ DB sync error:', e));
 

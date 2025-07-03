@@ -6,17 +6,35 @@ import sportsBanner from '../../images/sports-banner.png';
 import { useAuth } from '../AuthContext';
 
 export default function HomePage() {
+  const [categories, setCategories] = useState([]);
+  const [selectedCategory, setSelectedCategory] = useState('');
   const [products, setProducts] = useState([]);
   const [quantities, setQuantities] = useState({});
   const [messages, setMessages] = useState({});
   const { token } = useAuth();
 
   useEffect(() => {
-    fetchProducts();
+    fetchCategories();
   }, []);
 
+  useEffect(() => {
+    fetchProducts();
+  }, [selectedCategory]);
+
+  const fetchCategories = () => {
+    fetch('/api/categories')
+        .then(res => res.json())
+        .then(data => setCategories(data))
+        .catch(console.error);
+  }
+
   const fetchProducts = () => {
-    fetch('/api/products')
+    const params = new URLSearchParams();
+    if (selectedCategory) {
+      params.append('categoryId', selectedCategory);
+    }
+
+    fetch('/api/products?' + params.toString())
       .then(res => res.json())
       .then(data => {
         setProducts(data);
@@ -53,13 +71,14 @@ export default function HomePage() {
       setMessages(m => ({ ...m, [productId]: `✅ Rented (ID: ${data.rentalId})` }));
       fetchProducts();
     } catch (err) {
-      setMessages(m => ({ ...m, [productId]: `❌ ${err.message}` }));
+      setMessages(m => ({ ...m, [productId]: `❌ You must be logged in` }));
     }
   };
 
   return (
     <div className="page" style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column' }}>
       <Navbar />
+
 
       <div style={styles.bannerContainer}>
         <img src={sportsBanner} alt="Sports Banner" style={styles.banner} />
@@ -69,7 +88,36 @@ export default function HomePage() {
         </div>
       </div>
 
-      <h1 style={styles.heading}>Available Equipment</h1>
+      <div
+          style={{
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'space-between',
+            width: '100%',
+            maxWidth: '1100px',
+            margin: '10px auto 20px',
+          }}
+      >
+        <h1 style={styles.heading}>Available Equipment</h1>
+        <select
+            value={selectedCategory}
+            onChange={e => setSelectedCategory(e.target.value)}
+            style={{
+              padding: '0.5rem',
+              borderRadius: '6px',
+              border: '1px solid #ccc',
+              minWidth: '120px',
+            }}
+        >
+          <option value="">All</option>
+          {categories.map(c => (
+              <option key={c.id} value={c.id}>
+                {c.name}
+              </option>
+          ))}
+        </select>
+      </div>
+
       <div
         className="product-grid"
         style={{
