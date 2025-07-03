@@ -1,3 +1,4 @@
+const path = require('path');
 require('dotenv').config();
 const cors = require('cors');
 
@@ -9,7 +10,7 @@ require('./models/User');
 require('./models/Category');
 require('./models/Product');
 
-sequelize.sync({ alter: true })
+sequelize.sync()
     .then(() => console.log('✔ DB synced'))
     .catch(e => console.error('✖ DB sync error:', e));
 
@@ -29,6 +30,7 @@ app.use(express.urlencoded({ extended: true }));
 
 app.use('/', indexRouter);
 app.use('/users', usersRouter);
+app.use('/images', express.static(path.join(__dirname, 'public/images')));
 
 app.use('/api/auth', authRouter);
 app.use('/api/categories', categoriesRouter);

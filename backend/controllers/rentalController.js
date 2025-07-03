@@ -85,3 +85,49 @@ exports.getRentalHistory = async (req, res, next) => {
     next(err);
   }
 };
+
+exports.returnItem = async (req, res, next) => {
+  const { rentalId } = req.params;
+  const { productId, quantity } = req.body;
+
+  if (!productId || !quantity || quantity < 1) {
+    return res.status(400).json({ error: 'productId and quantity are required' });
+  }
+
+  try {
+    const item = await RentalItem.findOne({
+      where: {
+        rentalId,
+        productId
+      }
+    });
+    if (!item) {
+      return res.status(404).json({ error: 'No such item in rental' });
+    }
+    if (quantity > item.quantity) {
+      return res.status(400).json({ error: 'Return quantity exceeds rented quantity' });
+    }
+
+    const newQty = item.quantity - quantity;
+    await item.update({ quantity: newQty });
+
+    const product = await Product.findByPk(productId);
+    await product.update({ stock: product.stock + quantity });
+
+    if (newQty === 0) {
+      await item.destroy();
+    }
+
+    const remaining = await RentalItem.count({ where: { rentalId } });
+    if (remaining === 0) {
+      await Rental.update(
+        { returnedAt: new Date() },
+        { where: { id: rentalId } }
+      );
+    }
+
+    res.json({ message: 'Return processed', rentalId, productId, returned: quantity });
+  } catch (err) {
+    next(err);
+  }
+};

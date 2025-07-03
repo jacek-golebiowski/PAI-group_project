@@ -17,6 +17,7 @@ router.post(
     body('price').isDecimal(),
     body('stock').isInt({ min: 0 }),
     body('categoryId').isInt(),
+    body('imageName').isString().optional(),
     validate,
     ctrl.create
 );
@@ -25,6 +26,7 @@ router.put(
     '/:id',
     body('price').optional().isDecimal(),
     body('stock').optional().isInt({ min: 0 }),
+    body('imageName').isString().optional(),
     validate,
     ctrl.update
 );
