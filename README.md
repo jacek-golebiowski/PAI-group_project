@@ -188,7 +188,7 @@ Sprawdza obecność nagłówka Authorization, weryfikuje token JWT i dołącza o
       }
     };
 
-## e.Uruchomienie
+## e. Uruchomienie
 ### Uruchomienie backendu
 1. Przejdź do katalogu `backend`  
 2. Zainstaluj zależności:  
