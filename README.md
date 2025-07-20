@@ -3,7 +3,7 @@
 ## a. Identyfikacja zagadnienia biznesowego
 Projekt ma na celu stworzenie aplikacji do wypożyczania produktów, która ułatwia klientom szybki dostęp do oferty oraz zarządzanie wypożyczeniami online. Odbiorcami są użytkownicy poszukujący wygodnego sposobu na wypożyczenie sprzętu bez konieczności wizyty w sklepie fizycznym.
 
-Aplikacja pozwala na przeglądanie produktów, rejestrację i logowanie użytkowników, składanie zamówień na wypożyczenie, wyświetlanie wypożyczonego sprzętu z możliwością zwrotu. System zaspokaja potrzebę zdalnego i zautomatyzowanego procesu wypożyczania, co usprawnia obsługę klientów i zwiększa efektywność biznesu.
+Aplikacja pozwala na przeglądanie produktów, rejestrację i logowanie użytkowników, składanie zamówień na wypożyczenie, wyświetlanie wypożyczonego sprzętu z możliwością zwrotu. Po zalogowaniu danymi: login:admin@gmail, hasło: admin, Administrator ma możliwośc sprawdzenia historii wszystkich wypożyczeń a także dodawania, usuwania i edytowania produktów. System zaspokaja potrzebę zdalnego i zautomatyzowanego procesu wypożyczania, co usprawnia obsługę klientów i zwiększa efektywność biznesu.
 
 ## b. Wymagania systemowe i funkcjonalne
 
@@ -25,6 +25,8 @@ Aplikacja pozwala na przeglądanie produktów, rejestrację i logowanie użytkow
 * Wypożyczenia: użytkownik zalogowany może wypożyczyć określoną liczbę wybranego produktu na stronie produktu.
 
 * Zarządzanie wypożyczeniami: na osobnej stronie /rent użytkownik może przeglądać swoje aktywne wypożyczenia, zwracać produkty częściowo lub w całości.
+
+* Panel administracyjny: możliwość przeglądania historii wszystkich wypożyczeń, dodawania, edytowania i usuwania produktów.
 
 ## c. Analiza zagadnienia i jego modelowanie
 
@@ -211,7 +213,7 @@ Aplikacja wystartuje pod adresem http://localhost:5173
 
 ## f. Podsumowanie
 Projekt zrealizował główny cel: stworzenie aplikacji frontendowej umożliwiającej przeglądanie produktów, wypożyczanie oraz zwroty z autoryzacją użytkownika.
-W przyszłości można by  rozszerzyć aplikację  o panel administracyjny, powiadomienia push oraz integrację z płatnościami online, co pozwoli na pełniejsze wykorzystanie potencjału biznesowego systemu.
+W przyszłości można by  rozszerzyć aplikację  o powiadomienia push oraz integrację z płatnościami online, co pozwoli na pełniejsze wykorzystanie potencjału biznesowego systemu.
 
 
   
