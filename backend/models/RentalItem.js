@@ -7,6 +7,10 @@ const RentalItem = sequelize.define('RentalItem', {
   quantity: {
     type: DataTypes.INTEGER,
     allowNull: false,
+  },
+  productName: {
+    type: DataTypes.STRING,
+    allowNull: false,
   }
 });
 

@@ -1,7 +1,9 @@
 require('dotenv').config();
+const bcrypt   = require('bcrypt');
 const sequelize = require('./config/db');
 const Category = require('./models/Category');
 const Product = require('./models/Product');
+const User     = require('./models/User');
 
 async function seed() {
   try {
@@ -177,6 +179,19 @@ async function seed() {
     ];
 
     await Product.bulkCreate(productsData, { ignoreDuplicates: true });
+
+    const adminEmail = 'admin@gmail.com';
+    const adminPass  = 'admin';
+    const hash       = await bcrypt.hash(adminPass, 10);
+
+    await User.findOrCreate({
+      where: { email: adminEmail },
+      defaults: {
+        name: 'Administrator',
+        password: hash,
+        role: 'admin'
+      }
+    });
 
     console.log('👌 Seed completed successfully');
     process.exit(0);

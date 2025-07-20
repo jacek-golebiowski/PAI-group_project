@@ -20,6 +20,7 @@ const authRouter       = require('./routes/auth');
 const categoriesRouter = require('./routes/categories');
 const productsRouter   = require('./routes/products');
 const rentalRouter     = require('./routes/rentals');
+const adminRouter     = require('./routes/admin');
 
 const app = express();
 app.use(cors({ origin: 'http://localhost:5173', credentials: true }));
@@ -36,6 +37,7 @@ app.use('/api/auth', authRouter);
 app.use('/api/categories', categoriesRouter);
 app.use('/api/products', productsRouter);
 app.use('/api/rentals', rentalRouter);
+app.use('/api/admin', adminRouter);
 
 app.use((req, res) => {
     res.status(404).json({ error: 'Not Found' });

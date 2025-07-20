@@ -26,7 +26,7 @@ exports.login = async (req, res) => {
     const valid = await bcrypt.compare(password, user.password);
     if (!valid) return res.status(401).json({ error: 'Niepoprawne dane' });
 
-    const token = jwt.sign({ id: user.id, email: user.email }, SECRET, { expiresIn: '1d' });
+      const token = jwt.sign({ id: user.id, email: user.email, role: user.role }, SECRET, { expiresIn: '1d' });
 
     res.json({
       message: 'Zalogowano',
@@ -35,6 +35,7 @@ exports.login = async (req, res) => {
         id: user.id,
         email: user.email,
         name: user.name,
+        role: user.role
       },
     });
   } catch (err) {

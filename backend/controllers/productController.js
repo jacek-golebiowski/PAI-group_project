@@ -2,9 +2,13 @@ const Product  = require('../models/Product');
 const Category = require('../models/Category');
 
 const getFullimageName = (req, imageName) => {
-  if (!imageName) return null;
-  return `${req.protocol}://${req.get('host')}/images/${imageName}`;
+    if (!imageName) return null;
+    if (imageName.startsWith('http://') || imageName.startsWith('https://')) {
+        return imageName;
+    }
+    return `${req.protocol}://${req.get('host')}/images/${imageName}`;
 };
+
 
 exports.getAll = async (req, res, next) => {
   try {

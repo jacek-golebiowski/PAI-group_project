@@ -1,40 +1,49 @@
-const Rental = require('../models/Rental');
-const RentalItem = require('../models/RentalItem');
-const Product = require('../models/Product');
-const User = require('../models/User');
+// controllers/rentalController.js
+const { Op }    = require('sequelize');
+const sequelize = require('../config/db');
+const Rental    = require('../models/Rental');
+const RentalItem= require('../models/RentalItem');
+const Product   = require('../models/Product');
+const User      = require('../models/User');
 
 exports.rent = async (req, res, next) => {
+  const { items } = req.body;
+  const userId = req.user.id;
+
   try {
-    console.log('User from token:', req.user);
-    const userExists = await User.findByPk(req.user.id);
-    console.log('User in DB:', userExists);
-    const product = await Product.findByPk(1);
-    console.log('Product with ID=1:', product);
+    const created = await sequelize.transaction(async (t) => {
+      const rentals = [];
 
-    const { items } = req.body;
-    const userId = req.user.id;
+      for (const { productId, quantity } of items) {
+        const product = await Product.findByPk(productId, { transaction: t });
+        if (!product || product.stock < quantity) {
+          throw Object.assign(
+              new Error(`Brak produktu lub za mało sztuk: ${productId}`),
+              { status: 400 }
+          );
+        }
 
-    for (const item of items) {
-      const product = await Product.findByPk(item.productId);
-      if (!product || product.stock < item.quantity) {
-        return res.status(400).json({ error: `Brak produktu lub za mało sztuk: ${item.productId}` });
+        for (let i = 0; i < quantity; i++) {
+          const rental = await Rental.create({ userId }, { transaction: t });
+          await RentalItem.create({
+            rentalId:  rental.id,
+            productId,
+            quantity: 1,
+            productName: product.name
+          }, { transaction: t });
+          rentals.push(rental);
+        }
+
+        await product.update(
+            { stock: product.stock - quantity },
+            { transaction: t }
+        );
       }
-    }
 
-    const rental = await Rental.create({ userId });
+      return rentals;
+    });
 
-    for (const item of items) {
-      await RentalItem.create({
-        rentalId: rental.id,
-        productId: item.productId,
-        quantity: item.quantity,
-      });
-
-      const product = await Product.findByPk(item.productId);
-      await product.update({ stock: product.stock - item.quantity });
-    }
-
-    res.status(201).json({ message: 'Wypożyczono', rentalId: rental.id });
+    res.status(201).json({ message: 'Wypożyczono', rentals: created.map(r => r.id), rentalId: created[0].id });
   } catch (err) {
     next(err);
   }
@@ -43,14 +52,13 @@ exports.rent = async (req, res, next) => {
 exports.getUserRentals = async (req, res, next) => {
   try {
     const rentals = await Rental.findAll({
-      where: { userId: req.user.id },
+      where: { userId: req.user.id, returnedAt: null },
       include: [
         {
           model: RentalItem,
           as: 'items',
-          include: [
-            { model: Product, as: 'product' }
-          ]
+          where: { quantity: { [Op.gt]: 0 } },
+          include: [{ model: Product, as: 'product' }]
         }
       ],
       order: [['rentedAt', 'DESC']]
@@ -68,14 +76,12 @@ exports.getRentalHistory = async (req, res, next) => {
         {
           model: RentalItem,
           as: 'items',
-          include: [
-            { model: Product, as: 'product' }
-          ]
+          include: [{ model: Product, as: 'product' }]
         },
         {
           model: User,
           as: 'user',
-          attributes: ['id', 'email', 'name']
+          attributes: ['id','email','name']
         }
       ],
       order: [['rentedAt', 'DESC']]
@@ -88,45 +94,37 @@ exports.getRentalHistory = async (req, res, next) => {
 
 exports.returnItem = async (req, res, next) => {
   const { rentalId } = req.params;
-  const { productId, quantity } = req.body;
-
-  if (!productId || !quantity || quantity < 1) {
-    return res.status(400).json({ error: 'productId and quantity are required' });
-  }
 
   try {
-    const item = await RentalItem.findOne({
-      where: {
-        rentalId,
-        productId
+    await sequelize.transaction(async (t) => {
+      const rentalItem = await RentalItem.findOne({
+        where: { rentalId },
+        transaction: t
+      });
+      if (!rentalItem) {
+        throw Object.assign(new Error('No such item in rental'), { status: 404 });
+      }
+      await rentalItem.update({ quantity: 0 }, { transaction: t });
+
+      const product = await Product.findByPk(rentalItem.productId, { transaction: t });
+      await product.update(
+          { stock: product.stock + 1 },
+          { transaction: t }
+      );
+
+      const remaining = await RentalItem.count({
+        where: { rentalId },
+        transaction: t
+      });
+      if (rentalItem.quantity === 0) {
+        await Rental.update(
+            { returnedAt: new Date() },
+            { where: { id: rentalId }, transaction: t }
+        );
       }
     });
-    if (!item) {
-      return res.status(404).json({ error: 'No such item in rental' });
-    }
-    if (quantity > item.quantity) {
-      return res.status(400).json({ error: 'Return quantity exceeds rented quantity' });
-    }
 
-    const newQty = item.quantity - quantity;
-    await item.update({ quantity: newQty });
-
-    const product = await Product.findByPk(productId);
-    await product.update({ stock: product.stock + quantity });
-
-    if (newQty === 0) {
-      await item.destroy();
-    }
-
-    const remaining = await RentalItem.count({ where: { rentalId } });
-    if (remaining === 0) {
-      await Rental.update(
-        { returnedAt: new Date() },
-        { where: { id: rentalId } }
-      );
-    }
-
-    res.json({ message: 'Return processed', rentalId, productId, returned: quantity });
+    res.json({ message: 'Return processed', rentalId });
   } catch (err) {
     next(err);
   }

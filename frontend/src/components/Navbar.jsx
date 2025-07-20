@@ -1,12 +1,15 @@
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { FaUserCircle } from 'react-icons/fa';
 import { useState, useRef, useEffect } from 'react';
 import { useAuth } from '../AuthContext';
+
 
 export default function Navbar() {
   const [open, setOpen] = useState(false);
   const { user, logout } = useAuth();
   const menuRef = useRef();
+  const navigate = useNavigate();
+
 
   useEffect(() => {
     const handleClickOutside = (e) => {
@@ -22,7 +25,13 @@ export default function Navbar() {
     <nav style={styles.nav}>
       <div>
         <Link to="/" style={{...styles.link, marginRight: 20 }}>🏠 Home</Link>
-        {user && <Link to="/rent" style={styles.link}>Rent</Link>}
+        {user && <Link to="/rent" style={{...styles.link, marginRight: 20}}>Rent</Link>}
+        {user?.role === 'admin' && (
+              <>
+                  <Link to="/history" style={{...styles.link, marginRight: 20 }}>History</Link>
+                  <Link to="/manage-products" style={{...styles.link, marginRight: 20}}>Products</Link>
+              </>
+            )}
       </div>
 
       <div style={styles.userArea} ref={menuRef}>
@@ -36,7 +45,19 @@ export default function Navbar() {
           <div style={styles.dropdown}>
             {!user && <Link to="/login" style={styles.link}>Login</Link>}
             {!user && <Link to="/register" style={styles.link}>Register</Link>}
-            {user && <span style={styles.link} onClick={logout}>Logout</span>}
+            {user && (
+                <span
+                    style={styles.link}
+                    onClick={() => {
+                      logout();
+                      setTimeout(() => {
+                        navigate('/', { replace: true });
+                      }, 0);
+                    }}
+                >
+                Logout
+                </span>
+            )}
           </div>
         )}
       </div>
